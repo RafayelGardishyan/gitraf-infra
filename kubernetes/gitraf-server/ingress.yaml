@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gitraf-server
+  namespace: gitraf
+  labels:
+    app.kubernetes.io/name: gitraf-server
+    app.kubernetes.io/component: web-ui
+  annotations:
+    # Uncomment for cert-manager TLS
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Uncomment for nginx ingress
+    # nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: git.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gitraf-server
+                port:
+                  name: http
+  # Uncomment for TLS
+  # tls:
+  #   - hosts:
+  #       - git.example.com
+  #     secretName: gitraf-server-tls

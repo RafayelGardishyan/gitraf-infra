@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gitraf
+  labels:
+    app.kubernetes.io/name: gitraf
+    app.kubernetes.io/component: git-server

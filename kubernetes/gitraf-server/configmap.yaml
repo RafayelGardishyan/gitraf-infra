@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitraf-server-config
+  namespace: gitraf
+  labels:
+    app.kubernetes.io/name: gitraf-server
+    app.kubernetes.io/component: web-ui
+data:
+  GITRAF_REPOS_PATH: "/data/repos"
+  GITRAF_PORT: "8080"
+  # Set these to your domain values
+  GITRAF_PUBLIC_URL: ""
+  GITRAF_TAILNET_URL: ""
