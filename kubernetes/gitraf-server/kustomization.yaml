@@ -4,20 +4,17 @@ kind: Kustomization
 namespace: gitraf
 
 resources:
-  - namespace.yaml
   - configmap.yaml
-  - pvc.yaml
   - deployment.yaml
-  - service.yaml
-  # Uncomment to enable ingress
-  # - ingress.yaml
+  # Service not needed with hostNetwork (pods bind directly to host ports)
+  # Uncomment if using NodePort/ClusterIP instead
+  # - service.yaml
+  # - pvc.yaml  # Optional: use if you want PVC instead of hostPath
+  # - ingress.yaml  # Optional: for ingress-based routing
 
-labels:
-  - pairs:
-      app.kubernetes.io/part-of: gitraf
-    includeSelectors: true
+commonLabels:
+  app.kubernetes.io/part-of: gitraf
 
 images:
-  - name: gitraf-server
-    newName: gitraf-server
+  - name: docker.io/library/gitraf-server
     newTag: latest

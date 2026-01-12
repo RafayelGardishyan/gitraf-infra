@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: gitraf
+  labels:
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/component: reverse-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+        app.kubernetes.io/name: nginx
+        app.kubernetes.io/component: reverse-proxy
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: nginx
+          image: nginx:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              protocol: TCP
+            - containerPort: 443
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: letsencrypt
+              mountPath: /etc/letsencrypt
+              readOnly: true
+            - name: certbot
+              mountPath: /var/www/certbot
+            - name: pages
+              mountPath: /opt/ogit/pages
+              readOnly: true
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "25m"
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+              host: 127.0.0.1
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+              host: 127.0.0.1
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: config
+          configMap:
+            name: nginx-config
+        - name: letsencrypt
+          hostPath:
+            path: /etc/letsencrypt
+        - name: certbot
+          hostPath:
+            path: /var/www/certbot
+        - name: pages
+          hostPath:
+            path: /opt/ogit/pages

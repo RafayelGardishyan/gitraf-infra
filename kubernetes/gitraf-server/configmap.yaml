@@ -7,8 +7,13 @@ metadata:
     app.kubernetes.io/name: gitraf-server
     app.kubernetes.io/component: web-ui
 data:
+  # IMPORTANT: Replace these placeholder values with your actual configuration
+  # before deploying. Never commit actual secrets or internal URLs to version control.
   GITRAF_REPOS_PATH: "/data/repos"
-  GITRAF_PORT: "8080"
-  # Set these to your domain values
-  GITRAF_PUBLIC_URL: ""
-  GITRAF_TAILNET_URL: ""
+  GITRAF_PORT: "8081"
+  # Replace with your public git server URL (e.g., https://git.example.com)
+  GITRAF_PUBLIC_URL: "https://git.example.com"
+  # Replace with your Tailscale machine name (e.g., my-server.tail12345.ts.net)
+  GITRAF_TAILNET_URL: "your-machine.tailnet.ts.net"
+  # Replace with your pages base domain (e.g., example.com for *.example.com)
+  GITRAF_PAGES_BASE_URL: "example.com"

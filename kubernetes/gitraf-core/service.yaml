@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ogit
+  namespace: gitraf
+  labels:
+    app.kubernetes.io/name: ogit
+    app.kubernetes.io/component: git-backend
+spec:
+  type: NodePort
+  selector:
+    app: ogit
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30081
+      protocol: TCP

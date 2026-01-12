@@ -10,27 +10,58 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: gitraf-server
+      app: gitraf-server
   template:
     metadata:
       labels:
+        app: gitraf-server
         app.kubernetes.io/name: gitraf-server
         app.kubernetes.io/component: web-ui
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: gitraf-server
-          image: gitraf-server:latest
-          imagePullPolicy: IfNotPresent
+          image: docker.io/library/gitraf-server:latest
+          imagePullPolicy: Never
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: 8081
               protocol: TCP
+            - name: https
+              containerPort: 8443
+              protocol: TCP
+          # Configure these via environment variables or replace placeholders before deployment
+          args:
+            - "--repos"
+            - "/data/repos"
+            - "--templates"
+            - "/app/templates"
+            - "--port"
+            - "8081"
+            - "--tls-port"
+            - "8443"
+            - "--tls-cert"
+            - "/certs/tailscale.crt"
+            - "--tls-key"
+            - "/certs/tailscale.key"
+            - "--public-url"
+            - "$(GITRAF_PUBLIC_URL)"
+            - "--tailnet-url"
+            - "$(GITRAF_TAILNET_URL)"
+            - "--pages-base-url"
+            - "$(GITRAF_PAGES_BASE_URL)"
           envFrom:
             - configMapRef:
                 name: gitraf-server-config
           volumeMounts:
             - name: repos
               mountPath: /data/repos
+            - name: static
+              mountPath: /app/static
+            - name: certs
+              mountPath: /certs
+              readOnly: true
           resources:
             requests:
               memory: "64Mi"
@@ -42,22 +73,21 @@ spec:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 5
+            initialDelaySeconds: 10
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 3
+            initialDelaySeconds: 5
             periodSeconds: 5
-          securityContext:
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
-            runAsUser: 1000
-            allowPrivilegeEscalation: false
       volumes:
         - name: repos
-          persistentVolumeClaim:
-            claimName: gitraf-repos
-      securityContext:
-        fsGroup: 1000
+          hostPath:
+            path: /opt/ogit/data/repos
+        - name: static
+          hostPath:
+            path: /opt/gitraf-server/static
+        - name: certs
+          hostPath:
+            path: /opt/gitraf-server
