@@ -55,8 +55,10 @@ spec:
             - configMapRef:
                 name: gitraf-server-config
           volumeMounts:
-            - name: repos
-              mountPath: /data/repos
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /opt/ogit/config
             - name: static
               mountPath: /app/static
             - name: certs
@@ -82,9 +84,12 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
       volumes:
-        - name: repos
+        - name: data
           hostPath:
-            path: /opt/ogit/data/repos
+            path: /opt/ogit/data
+        - name: config
+          hostPath:
+            path: /opt/ogit/config
         - name: static
           hostPath:
             path: /opt/gitraf-server/static
